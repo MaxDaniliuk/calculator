@@ -87,17 +87,20 @@ body {
     color: white;
     font-size: larger;
     border: 2px solid #000000;
-    background-color: #595C67;
     flex: 1;
     border-radius: 8px;
 }
 
-.column-button {
+.emerald-button {
     background-color: #50C878;
 }
 
-.row-button {
+.blue-button {
     background-color: #6699cc;
+}
+
+.gray-button {
+    background-color: #595C67;
 }
 
 .footer {
