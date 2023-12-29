@@ -5,11 +5,13 @@ function startCalculation() {
     let operatorHolder = '';
     let number = '';
     let containerArr = [];
+    let answer = [];
     const displayCurrentValue = document.querySelector('.current-text');
     const displayOperation = document.querySelector('.previous-text');
     const numberBtns = document.querySelectorAll('.number');
     const operationBtns = document.querySelectorAll('.operation');
     const clearAllBtn = document.querySelector('#clear-all');
+    const equalsBtn = document.querySelector('#equals');
     let calculator = new Calculator;
 
     numberBtns.forEach(numberBtn => {
@@ -27,18 +29,16 @@ function startCalculation() {
                 number = '';
             }
             if (containerArr.length == 3) {
-                let calculationResult = String(calculator.calculate(containerArr));
-                console.log(calculationResult);
-                containerArr = [calculationResult, operatorHolder]
+                containerArr = evaluateFirstPair(calculator, containerArr, operatorHolder);
             }
             if (!isNaN(+containerArr[containerArr.length - 1])) {
                 containerArr.push(operationBtn.textContent);
             } else if (containerArr[containerArr.length - 1] == '+' || containerArr[containerArr.length - 1] == '-' || containerArr[containerArr.length - 1] == 'x' || containerArr[containerArr.length - 1] == '/') {
                 containerArr[containerArr.length - 1] = operationBtn.textContent
             }
-            displayOperation.textContent = containerArr.join(' ');
-            displayCurrentValue.textContent = containerArr[0];
-            console.log(containerArr);
+            displayOperation.textContent = containerArr.join(' '); //Repeats here 
+            displayCurrentValue.textContent = containerArr[0]; //Repeats here
+            console.log("ContainerArr is ", containerArr);
         });
     });
 
@@ -47,6 +47,21 @@ function startCalculation() {
         displayCurrentValue.textContent = 0;
         displayOperation.textContent = '';
         containerArr = [];
+        answer = [];
+    });
+    
+    equalsBtn.addEventListener('click', () => {
+        if (answer.length > 0) {
+            answer = []
+        }
+        containerArr.push(number);
+        number = ''
+        answer = answer.concat(containerArr);
+        answer.push(equalsBtn.textContent);
+        displayOperation.textContent = answer.join(' ');
+        let copyArr = evaluateFirstPair(calculator, containerArr.slice(), operatorHolder);
+        displayCurrentValue.textContent = copyArr[0]; 
+        containerArr = evaluateFirstPair(calculator, containerArr, operatorHolder);
     });
 }
 
@@ -62,7 +77,7 @@ function Calculator() {
         a = +array[0]
         op = array[1]
         b = +array[2]
-
+        
         if (!this.methods[op] || isNaN(a) || isNaN(b)) {
             return NaN;
           }
@@ -72,6 +87,10 @@ function Calculator() {
     }
 }
 
-
+function evaluateFirstPair(obj, ...args) {
+    let result = String(obj.calculate(args[0]));
+    args[0] = [result, args[1]];
+    return args[0];
+}
 
 startCalculation();
