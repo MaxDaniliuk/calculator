@@ -87,36 +87,38 @@ function startCalculation() {
         if (answer.length > 0) {
             answer = [];
         }
-        let percentage;
-        if (number[number.length - 1] === "%" &&  containerArr.length == 0) {
-            console.log("%% Container Arr after = but before any manipulation", containerArr)
-            percentage = number;
+        let tempNum;
+        if (number[number.length - 1] === "%" &&  containerArr.length == 0  && displayOperation.textContent === '') {
+            tempNum = number;
             number = calculator.getSimplePercentage(number);
             containerArr.push(number);
-            answer.push(percentage)
-            answer.push(equalsBtn.textContent);
+            let answerComponents = [tempNum, equalsBtn.textContent];
+            answer.push(...answerComponents);
             displayOperation.textContent = answer.join(' ');
             displayCurrentValue.textContent = number;
             number = ''
-            console.log("% Now number is ", number)
-            console.log("% and containerArr is ", containerArr)
-            console.log("% answer is ", answer)
-        } else {
-            console.log("Container Arr after = but before any manipulation", containerArr)
+        } else if (displayOperation.textContent[0] === displayCurrentValue.textContent.match(/(\d+)/)[0] && displayCurrentValue.textContent[displayCurrentValue.textContent.length - 1] === "%") {
+                tempNum = number; //8%
+                number = calculator.getSimplePercentage(number); //0.08 containerArr is now empty
+                answer = answer.concat(displayOperation.textContent.split(' '));
+                answer.push(tempNum);
+                containerArr = evaluateFirstPair(calculator, answer, operatorHolder); //Container has NUMBER and OPERATOR
+                answer.push(equalsBtn.textContent)
+                displayOperation.textContent = answer.join(' ');
+                displayCurrentValue.textContent = containerArr[0];
+                number = '';
+        } else if (!(number.length == 0) && containerArr.length == 2) {
             containerArr.push(number);
             number = ''
             answer = answer.concat(containerArr);
             answer.push(equalsBtn.textContent);
             let copyArr = evaluateFirstPair(calculator, containerArr.slice(), operatorHolder);
             containerArr = evaluateFirstPair(calculator, containerArr, operatorHolder);
-             
             displayOperation.textContent = answer.join(' ');
             displayCurrentValue.textContent = copyArr[0];
-            console.log("containerArr is ", containerArr)
-            console.log("number is ", number)
-            console.log("answer array is ", answer)
-        }
+        } 
     });
+    
 }
 
 function Calculator() {
