@@ -16,7 +16,7 @@ function startCalculation() {
 
     numberBtns.forEach(numberBtn => {
         numberBtn.addEventListener('click', () => {
-            if (!(number[number.length - 1] === "%")) {
+            if (!(number[number.length - 1] === "%" || displayCurrentValue.textContent === "Error")) {
                 number += numberBtn.textContent;
                 displayCurrentValue.textContent = number;
             }
@@ -25,54 +25,61 @@ function startCalculation() {
 
     operationBtns.forEach(operationBtn => {
         operationBtn.addEventListener('click', () => {
-            operatorHolder = operationBtn.textContent;
-            if (!(number.length === 0)) {
-                if (number[number.length - 1] === "%") {
-                    number = calculator.getSimplePercentage(number);
+            if (!(displayCurrentValue.textContent === "Error")) {
+                operatorHolder = operationBtn.textContent;
+                if (!(number.length === 0)) {
+                    if (number[number.length - 1] === "%") {
+                        number = calculator.getSimplePercentage(number);
+                    }
+                    containerArr.push(number);
+                    number = '';
                 }
-                containerArr.push(number);
-                number = '';
-            }
-            if (containerArr.length == 3) {
-                if (isNaN(containerArr[2])) {
-                    containerArr = evaluateFirstPair(calculator, containerArr, operatorHolder);
-                } else {
-                    containerArr = evaluateFirstPair(calculator, containerArr, operatorHolder);
+                if (containerArr.length == 3) {
+                    if (isNaN(containerArr[2])) {
+                        containerArr = evaluateFirstPair(calculator, containerArr, operatorHolder);
+                    } else {
+                        containerArr = evaluateFirstPair(calculator, containerArr, operatorHolder);
+                    }
                 }
+                if (!isNaN(+containerArr[containerArr.length - 1])) {
+                    containerArr.push(operationBtn.textContent);
+                } else if (containerArr[containerArr.length - 1] == '+' || containerArr[containerArr.length - 1] == '-' || containerArr[containerArr.length - 1] == 'x' || containerArr[containerArr.length - 1] == '/') {
+                    containerArr[containerArr.length - 1] = operationBtn.textContent
+                }
+                displayOperation.textContent = containerArr.join(' ');
+                displayCurrentValue.textContent = containerArr[0];
+            } else {
+                displayOperation.textContent = '';
             }
-            if (!isNaN(+containerArr[containerArr.length - 1])) {
-                containerArr.push(operationBtn.textContent);
-            } else if (containerArr[containerArr.length - 1] == '+' || containerArr[containerArr.length - 1] == '-' || containerArr[containerArr.length - 1] == 'x' || containerArr[containerArr.length - 1] == '/') {
-                containerArr[containerArr.length - 1] = operationBtn.textContent
-            }
-            displayOperation.textContent = containerArr.join(' ');
-            displayCurrentValue.textContent = containerArr[0];
         });
     });
 
     percentageBtn.addEventListener('click', () => {
-        if (!(number.length === 0)) {    
-            if (!(number[number.length - 1] === '%')) {
-                let numberSplit = number.split('');
-                count = 0;
-                for (let i = 0; i < numberSplit.length; i++) {
-                    if (numberSplit[i] === "%") {
-                        count += 1;
+        if (!(displayCurrentValue.textContent === "Error")) {
+            if (!(number.length === 0)) {    
+                if (!(number[number.length - 1] === '%')) {
+                    let numberSplit = number.split('');
+                    count = 0;
+                    for (let i = 0; i < numberSplit.length; i++) {
+                        if (numberSplit[i] === "%") {
+                            count += 1;
+                        }
+                    }
+                    if (count < 1) {
+                        number += percentageBtn.textContent;
+                        displayCurrentValue.textContent = number;
                     }
                 }
-                if (count < 1) {
-                    number += percentageBtn.textContent;
-                    displayCurrentValue.textContent = number;
-                }
             }
+            if (number.length == 0 && containerArr.length == 2) {
+                number = containerArr[0];
+                number += percentageBtn.textContent;
+                displayCurrentValue.textContent = number;
+                containerArr = [];
+            }
+        } else {
+            displayOperation.textContent = '';
         }
-        if (number.length == 0 && containerArr.length == 2) {
-            number = containerArr[0];
-            number += percentageBtn.textContent;
-            displayCurrentValue.textContent = number;
-            containerArr = [];
-        }
-        
     });
     
     clearAllBtn.addEventListener('click', () => {
@@ -84,39 +91,44 @@ function startCalculation() {
     });
 
     equalsBtn.addEventListener('click', () => {
-        if (answer.length > 0) {
-            answer = [];
-        }
-        let tempNum;
-        if (number[number.length - 1] === "%" &&  containerArr.length == 0  && displayOperation.textContent === '') {
-            tempNum = number;
-            number = calculator.getSimplePercentage(number);
-            containerArr.push(number);
-            let answerComponents = [tempNum, equalsBtn.textContent];
-            answer.push(...answerComponents);
-            displayOperation.textContent = answer.join(' ');
-            displayCurrentValue.textContent = number;
-            number = ''
-        } else if (displayOperation.textContent[0] === displayCurrentValue.textContent.match(/(\d+)/)[0] && displayCurrentValue.textContent[displayCurrentValue.textContent.length - 1] === "%") {
-                tempNum = number; //8%
-                number = calculator.getSimplePercentage(number); //0.08 containerArr is now empty
-                answer = answer.concat(displayOperation.textContent.split(' '));
-                answer.push(tempNum);
-                containerArr = evaluateFirstPair(calculator, answer, operatorHolder); //Container has NUMBER and OPERATOR
-                answer.push(equalsBtn.textContent)
+        
+        if (!(displayCurrentValue.textContent === "Error")) {
+            if (answer.length > 0) {
+                answer = [];
+            }
+            let tempNum;
+            if (number[number.length - 1] === "%" &&  containerArr.length == 0  && displayOperation.textContent === '') {
+                tempNum = number;
+                number = calculator.getSimplePercentage(number);
+                containerArr.push(number);
+                let answerComponents = [tempNum, equalsBtn.textContent];
+                answer.push(...answerComponents);
                 displayOperation.textContent = answer.join(' ');
-                displayCurrentValue.textContent = containerArr[0];
-                number = '';
-        } else if (!(number.length == 0) && containerArr.length == 2) {
-            containerArr.push(number);
-            number = ''
-            answer = answer.concat(containerArr);
-            answer.push(equalsBtn.textContent);
-            let copyArr = evaluateFirstPair(calculator, containerArr.slice(), operatorHolder);
-            containerArr = evaluateFirstPair(calculator, containerArr, operatorHolder);
-            displayOperation.textContent = answer.join(' ');
-            displayCurrentValue.textContent = copyArr[0];
-        } 
+                displayCurrentValue.textContent = number;
+                number = ''
+            } else if (displayOperation.textContent[0] === displayCurrentValue.textContent.match(/(\d+)/)[0] && displayCurrentValue.textContent[displayCurrentValue.textContent.length - 1] === "%") {
+                    tempNum = number; //8%
+                    number = calculator.getSimplePercentage(number); //0.08 containerArr is now empty
+                    answer = answer.concat(displayOperation.textContent.split(' '));
+                    answer.push(tempNum);
+                    containerArr = evaluateFirstPair(calculator, answer, operatorHolder); //Container has NUMBER and OPERATOR
+                    answer.push(equalsBtn.textContent)
+                    displayOperation.textContent = answer.join(' ');
+                    displayCurrentValue.textContent = containerArr[0];
+                    number = '';
+            } else if (!(number.length == 0) && containerArr.length == 2) {
+                containerArr.push(number);
+                number = ''
+                answer = answer.concat(containerArr);
+                answer.push(equalsBtn.textContent);
+                let copyArr = evaluateFirstPair(calculator, containerArr.slice(), operatorHolder);
+                containerArr = evaluateFirstPair(calculator, containerArr, operatorHolder);
+                displayOperation.textContent = answer.join(' ');
+                displayCurrentValue.textContent = copyArr[0];
+            }
+        } else {
+            displayOperation.textContent = '';
+        }
     });
     
 }
