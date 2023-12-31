@@ -1,4 +1,4 @@
-function changeSign(a) {return a * (-1)}
+//function changeSign(a) {return a * (-1)}
 
 function startCalculation() {
     const displayCurrentValue = document.querySelector('.current-text');
@@ -8,6 +8,7 @@ function startCalculation() {
     const clearAllBtn = document.querySelector('#clear-all');
     const equalsBtn = document.querySelector('#equals');
     const percentageBtn = document.querySelector('#percentage');
+    const signChangeBtn = document.querySelector('#sign-change');
     let operatorHolder = '';
     let number = '';
     let containerArr = [];
@@ -19,6 +20,8 @@ function startCalculation() {
             if (!(number[number.length - 1] === "%" || displayCurrentValue.textContent === "Error")) {
                 number += numberBtn.textContent;
                 displayCurrentValue.textContent = number;
+                console.log("after clicking number, container is ", containerArr)
+                console.log("after clicking number, it is ", number)
             }
         });
     });
@@ -48,10 +51,31 @@ function startCalculation() {
                 }
                 displayOperation.textContent = containerArr.join(' ');
                 displayCurrentValue.textContent = containerArr[0];
+                console.log("after clicking operator, container is ", containerArr);
+                console.log("after clicking operator, number is ", number);
             } else {
                 displayOperation.textContent = '';
             }
         });
+    });
+
+    signChangeBtn.addEventListener('click', () => {
+        if (!(displayCurrentValue.textContent === "Error")) {
+            if (number || number[number.length - 1] === "%") {
+                console.log("1, not empty; number is ", number)
+                number = calculator.changeSign(number);
+                displayCurrentValue.textContent = number;
+            } else if (!number && displayOperation.textContent[displayOperation.textContent.length - 1] === "=") {
+                console.log("2, not empty; number is ", number)
+                containerArr[0] = displayCurrentValue.textContent;
+                containerArr[0] = calculator.changeSign(containerArr[0]);
+                displayCurrentValue.textContent = containerArr[0];
+            } else {
+                console.log("empty; number is ", number)
+            }
+        } else {
+            displayOperation.textContent = '';
+        }
     });
 
     percentageBtn.addEventListener('click', () => {
@@ -68,7 +92,6 @@ function startCalculation() {
                     if (count < 1) {
                         number += percentageBtn.textContent;
                         displayCurrentValue.textContent = number;
-
                     }
                 }
             }
@@ -78,6 +101,8 @@ function startCalculation() {
                 displayCurrentValue.textContent = number;
                 containerArr = [];
             }
+            console.log("after clicking %, container is ", containerArr);
+            console.log("after clicking %, number is ", number);
         } else {
             displayOperation.textContent = '';
         }
@@ -108,7 +133,8 @@ function startCalculation() {
                     displayOperation.textContent = answer.join(' ');
                     displayCurrentValue.textContent = number;
                     number = ''
-                } else if (displayOperation.textContent[0] === displayCurrentValue.textContent.match(/(\d+)/)[0] && displayCurrentValue.textContent[displayCurrentValue.textContent.length - 1] === "%") {
+                } else if (displayOperation.textContent[0] === displayCurrentValue.textContent.match(/(-?\d+)/)[0] && displayCurrentValue.textContent[displayCurrentValue.textContent.length - 1] === "%") {
+                    //This regex should handle both - values and + values
                     tempNum = number; //8%
                     number = calculator.getSimplePercentage(number); //0.08 containerArr is now empty
                     answer = answer.concat(displayOperation.textContent.split(' '));
@@ -137,6 +163,8 @@ function startCalculation() {
                     displayOperation.textContent = answer.join(' ');
                     displayCurrentValue.textContent = copyArr[0];
                 } 
+                console.log("after clicking =, container is ", containerArr);
+                console.log("after clicking =, number is ", number);
             }
         } else {
             displayOperation.textContent = '';
@@ -180,6 +208,17 @@ function Calculator() {
        let strSplit = str.split('');
        strSplit.pop();
        return (strSplit.join('') / 100).toFixed(2);
+    }
+    
+    this.changeSign = function(str) {
+        let splitStr = str.split('');
+        if (splitStr.includes("%")) {
+            splitStr.pop();
+            let newStr = splitStr.join('');
+            return (String(newStr * (-1))) + "%"
+        } else {
+            return String(str * (-1));
+        }
     }
 
     this.calculate = function(array) {
