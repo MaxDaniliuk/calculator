@@ -14,6 +14,8 @@ body {
     font-family: 'Roboto', sans-serif;
 }
 
+/* Calculator container */
+
 .main {
     /*
     position: relative;
@@ -40,6 +42,8 @@ body {
     gap: 20px;
 }
 
+/* Screen */
+
 .display {
     min-height: 100px;
     background-color: whitesmoke;
@@ -60,6 +64,7 @@ body {
     display: flex;
     justify-content: end;
     align-items: center;
+    overflow: hidden; /* Prevents the text inside the span to overlap its div */
 }
 
 .previous-text {
@@ -69,6 +74,8 @@ body {
 .current-text {
     font-size: 40px;
 }
+
+/* Buttons */
 
 .button-panel {
     flex: 1;
@@ -92,16 +99,49 @@ body {
 }
 
 .emerald-button {
-    background-color: #50C878;
+    background-color: hsl(140, 52%, 55%);
+}
+
+.emerald-button:hover {
+    background-color: hsl(140, 46.8%, 49.5%);
+    transition: 0.3s;
+}
+
+.emerald-button:active {
+    background-color: hsl(140, 41.6%, 44.0%);
+}
+
+#equals:active {
+    background-color: hsl(140, 31.2%, 33%);;
 }
 
 .blue-button {
-    background-color: #6699cc;
+    background-color: hsl(210, 50%, 60%);
+}
+
+.blue-button:hover {
+    background-color: hsl(210, 45%, 54%);
+    transition: 0.3s;
+}
+
+.blue-button:active {
+    background-color: hsl(210, 40%, 48%);
 }
 
 .gray-button {
-    background-color: #595C67;
+    background-color: hsl(227, 7%, 38%);
 }
+
+.gray-button:hover {
+    background-color: hsl(227, 6.3%, 34.2%);
+    transition: 0.3s;
+}
+
+.gray-button:active {
+    background-color: hsl(227, 5.6%, 30.4%);
+}
+
+/* Footer */
 
 .footer {
     font-size: 20px;
