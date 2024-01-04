@@ -27,13 +27,10 @@ function startCalculation() {
                     if (number[number.length - 1] === '.' || number[number.length - 2] === '.') {
                         number += numberBtn.textContent;
                         displayCurrentValue.textContent = number;
-                        console.log("after . number is ", number)
                     }
                 } else {
                     number += numberBtn.textContent;
                     displayCurrentValue.textContent = number;
-                    console.log("after clicking number, container is ", containerArr)
-                    console.log("after clicking number, it is ", number)
                 }
             }
             
@@ -61,7 +58,6 @@ function startCalculation() {
                 if (number.length === 0 && removedNum) {
                     containerArr.push('0');
                     removedNum = false;
-                    console.log("After deleting and pressing operator number and containerArr are ", number, containerArr)
                 }
 
                 if (containerArr.length == 3) {
@@ -78,8 +74,6 @@ function startCalculation() {
                 }
                 displayOperation.textContent = containerArr.join(' ');
                 displayCurrentValue.textContent = containerArr[0];
-                console.log("after clicking operator, container is ", containerArr);
-                console.log("after clicking operator, number is ", number);
             } else {
                 displayOperation.textContent = '';
             }
@@ -92,15 +86,12 @@ function startCalculation() {
             if ((val || val[val.length - 1] === "%") && !(val === "0")) {
                 if (!(displayOperation.textContent[displayOperation.textContent.length - 1] === "=")) {
                     let array = val.split('');
-                    //console.log("num is converted to: ", array);
                     array.pop();
                     number = array.join('');
                     if (number.length === 0) {
                         removedNum = true;
                     }
                     displayCurrentValue.textContent = number;
-                    console.log("Entered", number);
-                    console.log("ContainerArr after deleting num is", containerArr);
                 }
             }
         }
@@ -114,16 +105,13 @@ function startCalculation() {
                     if (number) {
                         number += '.';
                         displayCurrentValue.textContent = number;
-                    } else {
-                        //if (!(displayCurrentValue.textContent == containerArr[0])) 
+                    } else { 
                         displayCurrentValue.textContent = containerArr[0] + '.';
                         number = displayCurrentValue.textContent;
                         containerArr = [];
                         
                     }
                 }
-                console.log("after pressing ., containerArr is ", containerArr)
-                console.log("after pressing ., number is ", number)
             }
         }
     });
@@ -166,8 +154,6 @@ function startCalculation() {
                 displayCurrentValue.textContent = number;
                 containerArr = [];
             }
-            console.log("after clicking %, container is ", containerArr);
-            console.log("after clicking %, number is ", number);
         } else {
             displayOperation.textContent = '';
         }
@@ -180,7 +166,7 @@ function startCalculation() {
         containerArr = [];
         answer = [];
     });
-    // Make new logic, reduce copies of the same code
+    // Improve logic to avoid copy pasting 
     equalsBtn.addEventListener('click', () => {
         if (!(displayCurrentValue.textContent === "Error")) {
             if (!(displayCurrentValue.textContent === '')) {
@@ -237,8 +223,6 @@ function startCalculation() {
                     displayCurrentValue.textContent = containerArr[0];
                     number = '';
                 }
-                console.log("after clicking =, container is ", containerArr);
-                console.log("after clicking =, number is ", number);
             }
         } else {
             displayOperation.textContent = '';
@@ -305,7 +289,6 @@ function Calculator() {
           }
         if (array.length > 2 ) {
             if (this.methods[op](a, b) === "Error") {
-                //Return ERROR, change display to '' and consider how to handle it
                 return this.methods[op](a, b);
             } else if (this.methods[op](a, b) % 1 === 0) {
                 return this.methods[op](a, b);
