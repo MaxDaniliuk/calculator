@@ -1,5 +1,3 @@
-//function changeSign(a) {return a * (-1)}
-
 function startCalculation() {
     const displayCurrentValue = document.querySelector('.current-text');
     const displayOperation = document.querySelector('.previous-text');
@@ -9,20 +7,36 @@ function startCalculation() {
     const equalsBtn = document.querySelector('#equals');
     const percentageBtn = document.querySelector('#percentage');
     const signChangeBtn = document.querySelector('#sign-change');
+    const decimalsBtn = document.querySelector('#decimals');
+    const clearPreviousBtn = document.querySelector('#clear-previous');
     let operatorHolder = '';
-    let number = '';
+    let number = '0';
     let containerArr = [];
     let answer = [];
+    let removedNum;
     let calculator = new Calculator;
 
     numberBtns.forEach(numberBtn => {
         numberBtn.addEventListener('click', () => {
+            let fixedNumbers = number.split('');
             if (!(number[number.length - 1] === "%" || displayCurrentValue.textContent === "Error")) {
-                number += numberBtn.textContent;
-                displayCurrentValue.textContent = number;
-                console.log("after clicking number, container is ", containerArr)
-                console.log("after clicking number, it is ", number)
+                if (number === '0') {
+                    number = '';
+                }
+                if (fixedNumbers.includes('.')) {
+                    if (number[number.length - 1] === '.' || number[number.length - 2] === '.') {
+                        number += numberBtn.textContent;
+                        displayCurrentValue.textContent = number;
+                        console.log("after . number is ", number)
+                    }
+                } else {
+                    number += numberBtn.textContent;
+                    displayCurrentValue.textContent = number;
+                    console.log("after clicking number, container is ", containerArr)
+                    console.log("after clicking number, it is ", number)
+                }
             }
+            
         });
     });
 
@@ -36,7 +50,20 @@ function startCalculation() {
                     }
                     containerArr.push(number);
                     number = '';
+                    removedNum = false;
+                   
                 }
+                if (number === "0") {
+                    containerArr.push(number);
+                    number = '';
+                }
+
+                if (number.length === 0 && removedNum) {
+                    containerArr.push('0');
+                    removedNum = false;
+                    console.log("After deleting and pressing operator number and containerArr are ", number, containerArr)
+                }
+
                 if (containerArr.length == 3) {
                     if (isNaN(containerArr[2])) {
                         containerArr = evaluateFirstPair(calculator, containerArr, operatorHolder);
@@ -58,20 +85,58 @@ function startCalculation() {
             }
         });
     });
+    
+    clearPreviousBtn.addEventListener('click', () => {
+        if (!(displayCurrentValue.textContent === "Error")) {
+            let val = displayCurrentValue.textContent;
+            if ((val || val[val.length - 1] === "%") && !(val === "0")) {
+                if (!(displayOperation.textContent[displayOperation.textContent.length - 1] === "=")) {
+                    let array = val.split('');
+                    //console.log("num is converted to: ", array);
+                    array.pop();
+                    number = array.join('');
+                    if (number.length === 0) {
+                        removedNum = true;
+                    }
+                    displayCurrentValue.textContent = number;
+                    console.log("Entered", number);
+                    console.log("ContainerArr after deleting num is", containerArr);
+                }
+            }
+        }
+    });
+
+    decimalsBtn.addEventListener('click', () => {
+        if (!(isNaN(displayCurrentValue.textContent))) {
+            if (!(displayCurrentValue.textContent === '')) {
+                let pointCheck = displayCurrentValue.textContent.split('');
+                if (!(pointCheck.includes('.'))) {
+                    if (number) {
+                        number += '.';
+                        displayCurrentValue.textContent = number;
+                    } else {
+                        //if (!(displayCurrentValue.textContent == containerArr[0])) 
+                        displayCurrentValue.textContent = containerArr[0] + '.';
+                        number = displayCurrentValue.textContent;
+                        containerArr = [];
+                        
+                    }
+                }
+                console.log("after pressing ., containerArr is ", containerArr)
+                console.log("after pressing ., number is ", number)
+            }
+        }
+    });
 
     signChangeBtn.addEventListener('click', () => {
         if (!(displayCurrentValue.textContent === "Error")) {
             if (number || number[number.length - 1] === "%") {
-                console.log("1, not empty; number is ", number)
                 number = calculator.changeSign(number);
                 displayCurrentValue.textContent = number;
             } else if (!number && displayOperation.textContent[displayOperation.textContent.length - 1] === "=") {
-                console.log("2, not empty; number is ", number)
                 containerArr[0] = displayCurrentValue.textContent;
                 containerArr[0] = calculator.changeSign(containerArr[0]);
                 displayCurrentValue.textContent = containerArr[0];
-            } else {
-                console.log("empty; number is ", number)
             }
         } else {
             displayOperation.textContent = '';
@@ -109,13 +174,13 @@ function startCalculation() {
     });
     
     clearAllBtn.addEventListener('click', () => {
-        number = '';
+        number = '0';
         displayCurrentValue.textContent = 0;
         displayOperation.textContent = '';
         containerArr = [];
         answer = [];
     });
-
+    // Make new logic, reduce copies of the same code
     equalsBtn.addEventListener('click', () => {
         if (!(displayCurrentValue.textContent === "Error")) {
             if (!(displayCurrentValue.textContent === '')) {
@@ -133,13 +198,12 @@ function startCalculation() {
                     displayOperation.textContent = answer.join(' ');
                     displayCurrentValue.textContent = number;
                     number = ''
-                } else if (displayOperation.textContent[0] === displayCurrentValue.textContent.match(/(-?\d+)/)[0] && displayCurrentValue.textContent[displayCurrentValue.textContent.length - 1] === "%") {
-                    //This regex should handle both - values and + values
-                    tempNum = number; //8%
-                    number = calculator.getSimplePercentage(number); //0.08 containerArr is now empty
+                } else if (displayOperation.textContent.split(' ')[0] === displayCurrentValue.textContent.match(/(-?\d+)/)[0] && displayCurrentValue.textContent[displayCurrentValue.textContent.length - 1] === "%") {
+                    tempNum = number; 
+                    number = calculator.getSimplePercentage(number);
                     answer = answer.concat(displayOperation.textContent.split(' '));
                     answer.push(tempNum);
-                    containerArr = evaluateFirstPair(calculator, answer, operatorHolder); //Container has NUMBER and OPERATOR
+                    containerArr = evaluateFirstPair(calculator, answer, operatorHolder); 
                     answer.push(equalsBtn.textContent)
                     displayOperation.textContent = answer.join(' ');
                     displayCurrentValue.textContent = containerArr[0];
@@ -162,7 +226,17 @@ function startCalculation() {
                     containerArr = evaluateFirstPair(calculator, containerArr, operatorHolder);
                     displayOperation.textContent = answer.join(' ');
                     displayCurrentValue.textContent = copyArr[0];
-                } 
+                } else if (number.split('.')[0] == displayOperation.textContent.split(' ')[0] && containerArr.length == 0) {
+                    containerArr.push(number);
+                    number = ''
+                    answer = answer.concat(displayOperation.textContent.split(' '));
+                    answer.push(containerArr[0]);
+                    containerArr = evaluateFirstPair(calculator, answer, operatorHolder);
+                    answer.push(equalsBtn.textContent);
+                    displayOperation.textContent = answer.join(' ');
+                    displayCurrentValue.textContent = containerArr[0];
+                    number = '';
+                }
                 console.log("after clicking =, container is ", containerArr);
                 console.log("after clicking =, number is ", number);
             }
@@ -209,7 +283,7 @@ function Calculator() {
        strSplit.pop();
        return (strSplit.join('') / 100).toFixed(2);
     }
-    
+
     this.changeSign = function(str) {
         let splitStr = str.split('');
         if (splitStr.includes("%")) {
