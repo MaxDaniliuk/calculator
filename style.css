@@ -40,6 +40,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 20px;
+    box-shadow: 7px 7px 10px #000000;
 }
 
 /* Screen */
@@ -67,15 +68,19 @@ body {
     overflow: hidden; /* Prevents the text inside the span to overlap its div */
 }
 
-.previous-text {
+.current-operation {
     font-size: 20px;
 }
 
-.current-text {
+.current-operand {
     font-size: 40px;
 }
 
 /* Buttons */
+
+button:focus {
+    outline:none;
+}
 
 .button-panel {
     flex: 1;
