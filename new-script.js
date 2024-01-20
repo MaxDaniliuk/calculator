@@ -22,6 +22,8 @@ specialButtons.forEach(specialButton => {
         if (displayValue.textContent !== 'Error') {
             if (specialButton.textContent === '+/−') changeSign();
             if (specialButton.textContent === '.') enableDecimals();
+            if (specialButton.textContent === 'CE') deleteNumber();
+            if (specialButton.textContent === '%') activatePercentage();
         }
     });
 })
@@ -40,6 +42,17 @@ function enableDecimals() {
     }
     if (displayValue.textContent.includes('.') || displayValue.textContent.includes('%')) return;
     displayValue.textContent += '.';
+}
+
+function deleteNumber() {
+    displayValue.textContent = displayValue.textContent.slice(0, -1);
+    if (displayValue.textContent === '') {
+        displayValue.textContent = '0';
+    }
+}
+
+function activatePercentage() {
+    
 }
 
 numberButtons.forEach(numberButton => {
