@@ -7,7 +7,7 @@ const equalsButton = document.querySelector('#equals');
 const specialButtons = document.querySelectorAll('.special');
 let firstOperand = ''
 let secondOperand = '';
-let currentOperation = null;     // ÷
+let currentOperation = null;
 let screenReset = false;
 let numberSelected = false;
 
@@ -21,20 +21,26 @@ specialButtons.forEach(specialButton => {
     specialButton.addEventListener('click', () => {
         if (displayValue.textContent !== 'Error') {
             if (specialButton.textContent === '+/−') changeSign();
+            if (specialButton.textContent === '.') enableDecimals();
         }
     });
 })
 
 function changeSign() {
-    if (displayValue.textContent.includes('%') || displayValue.textContent === '0' || displayValue.textContent === '') {
-        return;
-    }
+    if (displayValue.textContent.includes('%') || displayValue.textContent === '0' || displayValue.textContent === '') return;
     if (numberSelected) {
-        displayValue.textContent *= (-1);
-        
+        displayValue.textContent *= (-1); 
     }
 }
 
+function enableDecimals() {
+    if (screenReset) resetScreen();
+    if (displayValue.textContent === '') {
+        displayValue.textContent = '0';
+    }
+    if (displayValue.textContent.includes('.') || displayValue.textContent.includes('%')) return;
+    displayValue.textContent += '.';
+}
 
 numberButtons.forEach(numberButton => {
     numberButton.addEventListener('click', () => {
@@ -46,14 +52,13 @@ numberButtons.forEach(numberButton => {
 
 function populateDisplay(number) {
     if (displayValue.textContent === '0' || screenReset) {
-        resetDisplay();
+        resetScreen();
     }
     displayValue.textContent += number;
     numberSelected = true;
-
 }
 
-function resetDisplay() {
+function resetScreen() {
     displayValue.textContent = '';
     screenReset = false;
 }
@@ -79,7 +84,6 @@ function assignOperation(operator) {
     displayOperation.textContent = `${displayValue.textContent} ${operator}`;
     currentOperation = operator;
     screenReset = true;
-    //numberSelected = false;
 }
 
 function evaluate(eqaulsSign = equalsButton.textContent) {
@@ -90,9 +94,8 @@ function evaluate(eqaulsSign = equalsButton.textContent) {
         displayOperation.textContent = `${firstOperand} ${currentOperation} ${secondOperand} ${eqaulsSign}`;
     }
     currentOperation = null;
-    //numberSelected = false;
+    screenReset = true;
 }
-// Conisder always taking display values for operations!
 
 clearAllButton.addEventListener('click', () => {
     firstOperand = '';
