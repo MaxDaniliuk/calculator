@@ -4,17 +4,36 @@ const displayValue = document.querySelector('.current-operand');
 const displayOperation = document.querySelector('.current-operation');
 const clearAllButton = document.querySelector('#clear-all');
 const equalsButton = document.querySelector('#equals');
-
+const specialButtons = document.querySelectorAll('.special');
 let firstOperand = ''
 let secondOperand = '';
 let currentOperation = null;     // ÷
 let screenReset = false;
+let numberSelected = false;
 
 equalsButton.addEventListener('click', () => {
     if (displayValue.textContent !== 'Error') {
         evaluate(equalsButton.textContent);
     }
 });
+
+specialButtons.forEach(specialButton => {
+    specialButton.addEventListener('click', () => {
+        if (displayValue.textContent !== 'Error') {
+            if (specialButton.textContent === '+/−') changeSign();
+        }
+    });
+})
+
+function changeSign() {
+    if (displayValue.textContent.includes('%') || displayValue.textContent === '0' || displayValue.textContent === '') {
+        return;
+    }
+    if (numberSelected) {
+        displayValue.textContent *= (-1);
+        
+    }
+}
 
 
 numberButtons.forEach(numberButton => {
@@ -30,6 +49,8 @@ function populateDisplay(number) {
         resetDisplay();
     }
     displayValue.textContent += number;
+    numberSelected = true;
+
 }
 
 function resetDisplay() {
@@ -41,13 +62,13 @@ operationButtons.forEach(operationButton => {
     operationButton.addEventListener('click', () => { 
         if (displayValue.textContent !== 'Error') {
             assignOperation(operationButton.textContent);
+            numberSelected = false;
         }
     });
 });
 
 
 function assignOperation(operator) { 
-    //Think how to store first value while changing operators or selecting second value...
     if (currentOperation !== null && !screenReset) {
         evaluate();
     }
@@ -55,10 +76,10 @@ function assignOperation(operator) {
         return displayOperation.textContent = 'Cannot divide by 0...';
     }
     firstOperand = displayValue.textContent;
-    displayOperation.textContent = `${firstOperand} ${operator}`;
+    displayOperation.textContent = `${displayValue.textContent} ${operator}`;
     currentOperation = operator;
     screenReset = true;
-    // Should change operator if the second operand has not been selected
+    //numberSelected = false;
 }
 
 function evaluate(eqaulsSign = equalsButton.textContent) {
@@ -69,14 +90,18 @@ function evaluate(eqaulsSign = equalsButton.textContent) {
         displayOperation.textContent = `${firstOperand} ${currentOperation} ${secondOperand} ${eqaulsSign}`;
     }
     currentOperation = null;
+    //numberSelected = false;
 }
 // Conisder always taking display values for operations!
 
 clearAllButton.addEventListener('click', () => {
-    firstOperand, secondOperand, displayOperation.textContent = '';
+    firstOperand = '';
+    secondOperand = '';
     currentOperation = null;
     screenReset = false;
     displayValue.textContent = '0';
+    displayOperation.textContent = '';
+    console.log("After clear ", firstOperand, secondOperand)
 });
 
 function operate(operator, a, b) {
