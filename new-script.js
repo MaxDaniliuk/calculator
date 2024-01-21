@@ -86,7 +86,6 @@ operationButtons.forEach(operationButton => {
     });
 });
 
-
 function assignOperation(operator) { 
     if (currentOperation !== null && !screenReset) {
         evaluate();
@@ -127,9 +126,7 @@ clearAllButton.addEventListener('click', () => {
     displayOperation.textContent = '';
 });
 
-function operate(operator, a, b) { // number% is directly given as param
-                                   // to the operate function, 
-    
+function operate(operator, a, b) {
     if (isNaN(a)) {
         a = Number(a.slice(0, -1)) / 100;
     } 
@@ -146,6 +143,15 @@ function operate(operator, a, b) { // number% is directly given as param
         case '÷': 
             return (+b == 0) ? 'Error' : +a / +b;
     }
+}
+
+function handleDecimals () {
+    //There is a lib called Big.js that handles proper rounding
+    //Link and explanation how to use can be found here
+    // https://www.youtube.com/watch?v=wETgMr6QMIE
+    // 
+    // Get back to this later
+    //
 }
 
 function evaluatePercentage(operator, a, b) {
