@@ -52,7 +52,8 @@ function deleteNumber() {
 }
 
 function activatePercentage() {
-    
+    if (displayValue.textContent.includes('%') || displayValue.textContent === '') return;
+    displayValue.textContent += '%';
 }
 
 numberButtons.forEach(numberButton => {
@@ -100,7 +101,14 @@ function assignOperation(operator) {
 }
 
 function evaluate(eqaulsSign = equalsButton.textContent) {
-    if (currentOperation === null || screenReset) return;
+    if ((currentOperation === null || screenReset) && displayValue.textContent.includes('%') && eqaulsSign) {
+        displayOperation.textContent = `${displayValue.textContent} ${eqaulsSign}`;
+        return displayValue.textContent = displayValue.textContent.slice(0, -1) / 100
+    }
+    if (currentOperation === null || screenReset) {
+        console.log('Enter here')
+        return;
+    }
     secondOperand = displayValue.textContent;
     displayValue.textContent = operate(currentOperation, firstOperand, secondOperand); 
     if (eqaulsSign) {
@@ -117,28 +125,43 @@ clearAllButton.addEventListener('click', () => {
     screenReset = false;
     displayValue.textContent = '0';
     displayOperation.textContent = '';
-    console.log("After clear ", firstOperand, secondOperand)
 });
 
-function operate(operator, a, b) {
-    a = Number(a);
-    b = Number(b);
+function operate(operator, a, b) { // number% is directly given as param
+                                   // to the operate function, 
+    
+    if (isNaN(a)) {
+        a = Number(a.slice(0, -1)) / 100;
+    } 
+    if (isNaN(b)) {
+        return evaluatePercentage(operator, a, b);
+    }
     switch (operator) {
         case '+':
-            return a + b;
+            return +a + +b;
         case '−':
-            return a - b;
+            return +a - +b;
         case '×': 
-            return a * b;
+            return +a * +b;
         case '÷': 
-            return (b == 0) ? 'Error' : a / b;             // ÷
+            return (+b == 0) ? 'Error' : +a / +b;
     }
 }
 
-
-
-
-// ÷ 
+function evaluatePercentage(operator, a, b) {
+    b = Number(b.slice(0, -1));
+    a = Number(a);
+    switch (operator) {
+        case '+':
+            return a + (a * b / 100);
+        case '−':
+            return a - (a * b / 100);
+        case '×': 
+            return a * b / 100;
+        case '÷':
+            return b == 0 ? "Error" : (a * 100 / b);
+    }
+}
 
 
 
